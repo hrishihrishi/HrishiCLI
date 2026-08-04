@@ -5,5 +5,9 @@
   "scripts": {
     "dev:cli": "bun run --watch packages/cli/src/index.tsx",
     "dev:server": "bun run --hot packages/server/src/index.ts"
+  },
+  "dependencies": {
+    "@sentry/bun": "^10.69.0",
+    "@sentry/hono": "^10.69.0"
   }
 }
