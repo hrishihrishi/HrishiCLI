@@ -1,5 +1,5 @@
 {
-  "name": "@nightcode/cli",
+  "name": "@hrishicli/cli",
   "module": "src/index.tsx",
   "type": "module",
   "private": true,
@@ -7,7 +7,7 @@
     "dev": "bun run --watch src/index.tsx"
   },
   "devDependencies": {
-    "@nightcode/server": "workspace:*",
+    "@hrishicli/server": "workspace:*",
     "@types/bun": "latest",
     "@types/react": "^19.2.14"
   },
@@ -15,7 +15,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@nightcode/shared": "workspace:*",
+    "@hrishicli/shared": "workspace:*",
     "@opentui/core": "^0.1.97",
     "@opentui/react": "^0.1.97",
     "hono": "^4.12.12",

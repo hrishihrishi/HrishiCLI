@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
-import { DEFAULT_CHAT_MODEL_ID } from "@nightcode/shared";
+import { DEFAULT_CHAT_MODEL_ID } from "@hrishicli/shared";
 import { useNavigate, useLocation } from "react-router";
 import { SessionShell } from "../components/session-shell";
 import { UserMessage } from "../components/messages";
@@ -21,7 +21,7 @@ export function NewSession() {
   const state = useMemo(() => {
     const parsed = newSessionStateSchema.safeParse(location.state);
     return parsed.success ? parsed.data : null;
-  }, [location.state])
+  }, [location.state]);
 
   // Guard: if navigated here directly without state, go home
   useEffect(() => {
@@ -57,15 +57,16 @@ export function NewSession() {
           throw new Error(await getErrorMessage(res));
         }
         const session = await res.json();
-        navigate(
-          `/sessions/${session.id}`,
-          { replace: true, state: { session } }
-        );
+        navigate(`/sessions/${session.id}`, {
+          replace: true,
+          state: { session },
+        });
       } catch (error) {
         if (ignore) return;
         toast.show({
           variant: "error",
-          message: error instanceof Error ? error.message : "Failed to create session",
+          message:
+            error instanceof Error ? error.message : "Failed to create session",
         });
         navigate("/", { replace: true });
       }
@@ -84,4 +85,4 @@ export function NewSession() {
       <UserMessage message={state.message} />
     </SessionShell>
   );
-};
+}

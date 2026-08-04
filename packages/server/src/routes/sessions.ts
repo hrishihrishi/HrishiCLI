@@ -2,9 +2,9 @@ import { Hono } from "hono";
 // import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { db } from "@nightcode/database";
-import { Role, Mode, MessageStatus } from "@nightcode/database/enums";
-import { findSupportedChatModel } from "@nightcode/shared";
+import { db } from "@hrishicli/database/client";
+import { Role, Mode, MessageStatus } from "@hrishicli/database/enums";
+import { findSupportedChatModel } from "@hrishicli/shared";
 
 const createSessionSchema = z.object({
   title: z.string(),
@@ -14,18 +14,22 @@ const createSessionSchema = z.object({
       role: z.enum(Role),
       content: z.string(),
       mode: z.enum(Mode),
-      model: z.string()
+      model: z
+        .string()
         .refine((id) => !!findSupportedChatModel(id), "Unsupported model"),
     })
     .optional(),
 });
 
 const createSessionValidator = zValidator(
-  "json", createSessionSchema, (result, c) => {
-  if (!result.success) {
-    return c.json({ error: "Invalid request body" }, 400);
-  }
-});
+  "json",
+  createSessionSchema,
+  (result, c) => {
+    if (!result.success) {
+      return c.json({ error: "Invalid request body" }, 400);
+    }
+  },
+);
 
 const app = new Hono()
   .get("/", async (c) => {
@@ -46,12 +50,12 @@ const app = new Hono()
 
     // MOCK: Uncomment to simulate session loading error
     // throw new HTTPException(
-    //   500, 
+    //   500,
     //   { message: "Mock error: session loading failed" }
     // )
 
     const id = c.req.param("id");
-    
+
     const session = await db.session.findUnique({
       where: { id },
       include: {
@@ -71,7 +75,7 @@ const app = new Hono()
 
     // MOCK: Uncomment to simulate session loading error
     // throw new HTTPException(
-    //   500, 
+    //   500,
     //   { message: "Mock error: session loading failed" }
     // )
 
@@ -88,7 +92,7 @@ const app = new Hono()
               status: MessageStatus.COMPLETE,
             },
           },
-        })
+        }),
       },
       include: { messages: true },
     });
