@@ -6,6 +6,7 @@ import {
   type SupportedChatModelId,
   type SupportedProvider,
 } from "@hrishicli/shared";
+import type { ProviderOptions } from "@ai-sdk/provider-utils";
 import type { LanguageModel } from "ai";
 
 type AnthropicModelId = Extract<
@@ -13,12 +14,46 @@ type AnthropicModelId = Extract<
   { provider: "anthropic" }
 >["id"];
 type OpenAIModelId = Extract<SupportedChatModel, { provider: "openai" }>["id"];
+type GeminiModelId = Extract<SupportedChatModel, { provider: "google" }>["id"];
 
 export type ResolvedModel = {
   model: LanguageModel;
   provider: SupportedProvider;
   modelId: SupportedChatModelId;
+  providerOptions?: ProviderOptions;
 };
+
+const ANTHROPIC_PROVIDER_OPTIONS: Partial<
+  Record<AnthropicModelId, ProviderOptions>
+> = {
+  "claude-opus-4-6": {
+    anthropic: {
+      thinking: {
+        type: "enabled",
+        budgetTokens: 10000,
+      },
+    },
+  },
+  "claude-sonnet-4-6": {
+    anthropic: {
+      thinking: {
+        type: "enabled",
+        budgetTokens: 10000,
+      },
+    },
+  },
+};
+
+const OPENAI_PROVIDER_OPTIONS: Partial<Record<OpenAIModelId, ProviderOptions>> =
+  {
+    "gpt-5.4": {
+      openai: {
+        thinking: {
+          reasoningSummary: "detailed",
+        },
+      },
+    },
+  };
 
 function assertUnsupportedProvider(provider: never): never {
   throw new Error(`Unsupported provider: ${provider}`);
@@ -29,6 +64,7 @@ function resolveAnthropicModel(modelId: AnthropicModelId): ResolvedModel {
     model: anthropic(modelId),
     provider: "anthropic",
     modelId,
+    providerOptions: ANTHROPIC_PROVIDER_OPTIONS[modelId],
   };
 }
 
@@ -37,6 +73,7 @@ function resolveOpenAIModel(modelId: OpenAIModelId): ResolvedModel {
     model: openai(modelId),
     provider: "openai",
     modelId,
+    providerOptions: OPENAI_PROVIDER_OPTIONS[modelId],
   };
 }
 
