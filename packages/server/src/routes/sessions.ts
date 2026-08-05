@@ -5,6 +5,7 @@ import { z } from "zod";
 import { db } from "@hrishicli/database/client";
 import { Role, Mode, MessageStatus } from "@hrishicli/database/enums";
 import { findSupportedChatModel } from "@hrishicli/shared";
+import type { AuthenticatedEnv } from "../middleware/require-auth";
 
 const createSessionSchema = z.object({
   title: z.string(),
@@ -31,9 +32,12 @@ const createSessionValidator = zValidator(
   },
 );
 
-const app = new Hono()
+const app = new Hono<AuthenticatedEnv>()
   .get("/", async (c) => {
+    const userId = c.get("userId");
+
     const sessions = await db.session.findMany({
+      where: { userId },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -55,9 +59,10 @@ const app = new Hono()
     // )
 
     const id = c.req.param("id");
+    const userId = c.get("userId");
 
     const session = await db.session.findUnique({
-      where: { id },
+      where: { id, userId },
       include: {
         messages: { orderBy: { createdAt: "asc" } },
       },
@@ -79,12 +84,13 @@ const app = new Hono()
     //   { message: "Mock error: session loading failed" }
     // )
 
+    const userId = c.get("userId");
     const { initialMessage, ...data } = c.req.valid("json");
 
     const session = await db.session.create({
       data: {
         ...data,
-        userId: "mock-user",
+        userId,
         ...(initialMessage && {
           messages: {
             create: {
