@@ -1,5 +1,5 @@
 {
-  "name": "@hrishicli/shared",
+  "name": "@nightcode/shared",
   "type": "module",
   "private": true,
   "exports": {
